@@ -1,0 +1,12 @@
+[package]
+name    = "fosslim"
+version = "0.0.1-pre"
+authors = ["Timo Sulg <timo@versioneye.com>"]
+description = "A License matcher for the FOSS licenses;"
+keywords  = ["FOSS", "license", "SPDX"]
+license   = "MIT"
+
+[[lib]]
+name    = "fosslim"
+test    = true
+plugin  = true
