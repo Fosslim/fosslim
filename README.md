@@ -23,6 +23,8 @@ It is still under **active development**, but it will be released as Rust librar
 * SPDX lookup - https://github.com/bbqsrc/spdx-lookup-python
 * LibrariesIO license normalizer - https://github.com/librariesio/spdx
 * Google's license classifier - https://github.com/google/licenseclassifier
+* Fossology - https://github.com/fossology/fossology
+* LicenseFinder - https://github.com/pivotal/LicenseFinder
 
 and many other similar hacks on Github
 
