@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
-pub struct Document {
+pub struct Document<'a> {
     pub id: usize,     // documents id on the index
-    pub label: &'static str,  // spdx id for license aka docment class to predict
-    pub text: &'static str,   // original text
-    pub tcm: HashMap< &'static str, u32 > // term Count map
+    pub label: &'a str,  // spdx id for license aka docment class to predict
+    pub text: &'a str,   // original text
+    pub tcm: HashMap< &'a str, u32 > // term Count map
 }
 
-impl Document {
-    pub fn new(id: usize, label: &'static str, text: &'static str) -> Document {
+impl<'a> Document<'a> {
+    pub fn new(id: usize, label: &'a str, text: &'a str) -> Document<'a> {
         Document {
             id: id,
             label: label,
@@ -22,7 +22,7 @@ impl Document {
         let tokens = self.text.split_whitespace();
 
         for token in tokens {
-            let counter = self.tcm.entry(token).or_insert(0);
+            let counter = self.tcm.entry(&token).or_insert(0);
             *counter += 1u32
         }
     }

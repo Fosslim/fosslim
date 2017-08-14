@@ -15,6 +15,5 @@ fn test_index_example1(){
         "isOsiApproved": true
     }"#;
 
-    let res = fosslim::index::build_from_json(test_doc);
-    assert!(res.is_ok());
+    assert!(false);
 }
