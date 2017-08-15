@@ -1,4 +1,3 @@
-extern crate fst;
 extern crate serde_json;
 
 #[macro_use]
