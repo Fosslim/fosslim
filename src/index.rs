@@ -7,10 +7,7 @@ use serde::Deserialize;
 use serde_json;
 use serde_json::{Value, Error};
 
-use document::Document;
-
-
-type DocumentHeap<'a> = Vec<Box<Document<'a>>>;
+use document::{self, Document};
 
 pub struct IndexerError<'a> {
     pub message: &'a str,
@@ -22,16 +19,16 @@ impl<'a> IndexerError<'a> {
     }
 }
 
-pub struct Index<'a> {
+pub struct Index {
     pub n_terms: usize,
     pub n_docs: usize,
-    terms: HashMap<&'a str, usize>,
-    documents: Vec< Box<Document<'a>> >,
+    terms: HashMap<String, usize>,
+    documents: Vec<Document>,
     term_doc_idx: Vec<Vec<usize>>, // matrix [0 -> [docID1, docID2]]
 }
 
-impl<'a> Index<'a> {
-    pub fn new() -> Index<'a> {
+impl Index {
+    pub fn new() -> Index {
         Index {
             n_terms: 0,
             n_docs: 0,
@@ -42,8 +39,8 @@ impl<'a> Index<'a> {
     }
 
 
-    pub fn add_term(&mut self, term: &'a str) -> Option<usize> {
-        if self.terms.contains_key(term) {
+    pub fn add_term(&mut self, term: String) -> Option<usize> {
+        if self.terms.contains_key(&term) {
             let term_id:usize = *self.terms.get(&term).unwrap();
             Some(term_id)
 
@@ -56,7 +53,7 @@ impl<'a> Index<'a> {
         }
     }
 
-    pub fn add(&mut self, doc: Box<Document<'a>> ) -> Result<usize, IndexerError> {
+    pub fn add(&mut self, doc: Document ) -> Result<usize, IndexerError> {
         let current_doc_id = self.n_docs;
 
         //add document into documents;
@@ -76,7 +73,7 @@ impl<'a> Index<'a> {
         doc.tokenize();
 
         for term in doc.tcm.keys() {
-            match self.add_term(term) {
+            match self.add_term(term.clone()) {
                 None => return Err(IndexerError::new("Failed to add term into index")),
                 Some(term_id) => {
                     // add document into term_doc_idx
@@ -88,12 +85,12 @@ impl<'a> Index<'a> {
         Ok(doc_id)
     }
 
-    pub fn get_docs_by_term(&self, term: &'a str) -> Option<DocumentHeap> {
-        if !self.terms.contains_key(term) {
+    pub fn get_docs_by_term(&self, term: String) -> Option<Vec<Document>> {
+        if !self.terms.contains_key(&term) {
             return None;
         }
 
-        let term_id = self.terms[term];
+        let term_id = self.terms[&term];
         let docs = self.term_doc_idx[term_id]
             .iter()
             .fold(vec![], |mut acc, &id|{
@@ -120,3 +117,28 @@ impl<'a> Index<'a> {
         Some(doc_pos)
     }
 }
+
+
+// builds Index from json files found in the path
+pub fn build_from_path<'a>(target_path: &'static str) -> Result<usize, IndexerError> {
+    let path = Path::new(target_path);
+    if !path.exists() {
+        return Err(IndexerError::new("target path doesnt exists or is not accessible"));
+    }
+
+    let mut idx = Index::new();
+
+    // iterate over files and build docs and add them into index
+    for entry in path.read_dir().expect("read_dir failed") {
+        if let Ok(metadata) = entry {
+            // add new document into index only if it was parsed successfullys
+            if let Ok(doc) = document::from_json_file(metadata.path()) {
+               idx.add(doc);
+            }
+
+        }
+    }
+
+    Ok(idx.n_docs)
+}
+
