@@ -26,3 +26,15 @@ fn test_document_parse_from_file(){
         assert_eq!(1077, doc.text.len());
     }
 }
+
+#[test]
+fn test_document_from_json_file(){
+    let fp = File::open("tests/fixtures/licenses/MIT.json").expect("Failed to open test file");
+    let res = document::parse_from_file(fp);
+
+    assert!(res.is_ok());
+    if let Ok(doc) = res {
+        assert_eq!("MIT", doc.label);
+        assert_eq!(1077, doc.text.len());
+    }
+}

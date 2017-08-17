@@ -3,10 +3,6 @@ use std::fs::File;
 use std::path::Path;
 use std::collections::{HashMap, HashSet};
 
-use serde::Deserialize;
-use serde_json;
-use serde_json::{Value, Error};
-
 use document::{self, Document};
 
 pub struct IndexerError<'a> {
@@ -68,7 +64,7 @@ impl Index {
             return Err(IndexerError::new("found no such document"));
         }
 
-        //TODO: mover tokenizer into own module
+        // TODO: mover tokenizer into own module
         let mut doc = self.documents[doc_id].clone();
         doc.tokenize();
 
@@ -120,7 +116,7 @@ impl Index {
 
 
 // builds Index from json files found in the path
-pub fn build_from_path<'a>(target_path: &'static str) -> Result<usize, IndexerError> {
+pub fn build_from_path<'a>(target_path: &'a str) -> Result<Index, IndexerError> {
     let path = Path::new(target_path);
     if !path.exists() {
         return Err(IndexerError::new("target path doesnt exists or is not accessible"));
@@ -139,6 +135,6 @@ pub fn build_from_path<'a>(target_path: &'static str) -> Result<usize, IndexerEr
         }
     }
 
-    Ok(idx.n_docs)
+    Ok(idx)
 }
 

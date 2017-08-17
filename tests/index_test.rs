@@ -41,3 +41,18 @@ fn test_index_doc_new_document() {
     assert_eq!(1, docs.len());
     assert_eq!("test".to_string(), docs[0].label)
 }
+
+
+#[test]
+fn test_build_from_path() {
+    let test_path = "test/fixtures/licenses";
+    let res = index::build_from_path(test_path);
+
+    assert!(res.is_ok());
+    if let Ok(idx) = res {
+        assert_eq!(2, idx.n_docs);
+
+        let docs = idx.get_docs_by_term("MIT".to_string()).expect("Not docs with MIT");
+        assert_eq!(1, docs.len());
+    }
+}
