@@ -1,10 +1,17 @@
+use std::rc::Rc;
 //use std::error::Error;
 use std::fs::File;
 use std::path::Path;
+//TODO: reseacrc: will it be bottleneck, or BufferedWriter
+use std::io::{Write, Read};
 use std::collections::{HashMap, HashSet};
+
+use serde::{Deserialize, Serialize};
+use rmp_serde::{Deserializer, Serializer};
 
 use document::{self, Document};
 
+#[derive(Debug)]
 pub struct IndexerError<'a> {
     pub message: &'a str,
 }
@@ -15,6 +22,7 @@ impl<'a> IndexerError<'a> {
     }
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Index {
     pub n_terms: usize,
     pub n_docs: usize,
@@ -102,7 +110,6 @@ impl Index {
         // term doesnt exist in the index
         if term_id >= self.term_doc_idx.len() {
             self.term_doc_idx.push(vec![])
-            //self.term_doc_idx[term_id] = vec![]
         };
 
         let doc_pos = self.term_doc_idx[term_id].len();
@@ -127,14 +134,53 @@ pub fn build_from_path<'a>(target_path: &'a str) -> Result<Index, IndexerError> 
     // iterate over files and build docs and add them into index
     for entry in path.read_dir().expect("read_dir failed") {
         if let Ok(metadata) = entry {
-            // add new document into index only if it was parsed successfullys
+            // add new document into index only if parsing was successful
             if let Ok(doc) = document::from_json_file(metadata.path()) {
-               idx.add(doc);
+               idx.add(doc).expect("Failed to add document");
             }
 
         }
     }
 
+    let n_docs = idx.n_docs as u32;
+    for id in 0..n_docs {
+        idx.index_doc(id as usize).is_ok();
+    }
+
     Ok(idx)
+
 }
 
+
+// dump index into file
+pub fn save<'a>(idx: &Index, target_path: &'a str) -> Result<bool, IndexerError<'a>> {
+    let mut fp = match File::create(target_path) {
+        Ok(fp) => fp,
+        Err(_) => return Err(IndexerError::new("Failed to open targetfile"))
+    };
+
+    let mut buf: Vec<u8> = Vec::new();
+    idx.serialize(&mut Serializer::new(&mut buf)).expect("Failed to serialize index");
+
+    fp.write_all(&buf).expect("Failed to write into file");
+    fp.sync_all().expect("Failed to save file on the disk");
+
+    Ok(true)
+}
+
+pub fn load<'a>(source_path: &'a str) -> Result<Index, IndexerError> {
+    let mut fp = match File::open(source_path) {
+        Ok(fp) => fp,
+        Err(_) => return Err(IndexerError::new("Failed to open sourcefile"))
+    };
+
+    let mut buf = Vec::new();
+    fp.read_to_end(&mut buf).expect("Failed to read a content of the sourcefile");
+
+    let mut de = Deserializer::new(&buf[..]);
+
+    match Deserialize::deserialize(&mut de) {
+        Ok(idx) => Ok(idx),
+        Err(_)  => Err(IndexerError::new("Failed to deserialize file buffer"))
+    }
+}

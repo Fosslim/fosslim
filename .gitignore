@@ -11,3 +11,6 @@ Cargo.lock
 
 # skip Intellij stuff
 .idea
+
+# dont commit thing from the temp folder
+temp/*

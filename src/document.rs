@@ -5,8 +5,10 @@ use std::io::{ Error, ErrorKind };
 
 use serde_json;
 use serde_json::Value;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone)]
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Document {
     pub id: usize, // documents id on the index
     pub label: String, // spdx id for license aka docment class to predict
