@@ -51,6 +51,22 @@ fn test_index_doc_new_document() {
 
 
 #[test]
+fn test_index_get_term_index(){
+    let mut idx = index::Index::new();
+    let mut doc = Document::new(0, "test".to_string(), "yellow cat".to_string());
+
+    idx.add(doc);
+    idx.index_doc(0);
+    assert_eq!(1, idx.n_docs);
+    assert_eq!(2, idx.n_terms);
+
+    let term_docs = idx.get_term_index();
+    assert_eq!(2, term_docs.len());
+    assert_eq!(0, term_docs[0].0);
+    assert_eq!(vec![0], term_docs[0].1)
+}
+
+#[test]
 fn test_index_build_from_path() {
     let test_path = "tests/fixtures/licenses";
     let res = index::build_from_path(test_path);

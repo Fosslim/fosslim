@@ -7,3 +7,7 @@ extern crate rmp_serde;
 
 pub mod document;
 pub mod index;
+pub mod tokenizer;
+pub mod score;
+pub mod jaccard;
+

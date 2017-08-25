@@ -1,15 +1,16 @@
-use std::rc::Rc;
 //use std::error::Error;
 use std::fs::File;
 use std::path::Path;
 //TODO: reseacrc: will it be bottleneck, or BufferedWriter
 use std::io::{Write, Read};
-use std::collections::{HashMap, HashSet};
+use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 use rmp_serde::{Deserializer, Serializer};
 
 use document::{self, Document};
+
+type TermIndex = Vec<Vec<usize>>;
 
 #[derive(Debug)]
 pub struct IndexerError<'a> {
@@ -26,7 +27,7 @@ impl<'a> IndexerError<'a> {
 pub struct Index {
     pub n_terms: usize,
     pub n_docs: usize,
-    terms: HashMap<String, usize>,
+    terms: BTreeMap<String, usize>,
     documents: Vec<Document>,
     term_doc_idx: Vec<Vec<usize>>, // matrix [0 -> [docID1, docID2]]
 }
@@ -36,7 +37,7 @@ impl Index {
         Index {
             n_terms: 0,
             n_docs: 0,
-            terms: HashMap::new(), // TODO: replace with fst?
+            terms: BTreeMap::new(), // TODO: replace with fst?
             documents: Vec::new(),
             term_doc_idx: vec![],
         }
@@ -105,6 +106,15 @@ impl Index {
         Some(docs)
     }
 
+    pub fn get_terms(&self) -> Vec<String> {
+        let mut vocabulary = Vec::with_capacity(self.n_terms);
+        for term in self.terms.keys() {
+            vocabulary.push(term.to_string() )
+        }
+
+        vocabulary
+    }
+
     fn add_doc_into_term_idx(&mut self, term_id: usize, doc_id: usize) -> Option<usize> {
 
         // term doesnt exist in the index
@@ -118,6 +128,25 @@ impl Index {
         self.term_doc_idx[term_id].push(doc_id);
 
         Some(doc_pos)
+    }
+
+    pub fn get_term_index(&self) -> Vec<(usize, Vec<usize>)> {
+        let mut term_idx = Vec::with_capacity(self.n_terms);
+        let mut term_id = 0 as usize;
+
+        for doc_ids in self.term_doc_idx.iter() {
+            term_idx.push( (term_id, doc_ids.clone() ) );
+            term_id += 1;
+        }
+
+        term_idx
+    }
+
+    pub fn get_document_label(&self, doc_id: usize) -> Option<String> {
+        match self.documents.get(doc_id) {
+            Some(doc) => Some(doc.clone().label),
+            _ => None
+        }
     }
 }
 
@@ -148,7 +177,6 @@ pub fn build_from_path<'a>(target_path: &'a str) -> Result<Index, IndexerError> 
     }
 
     Ok(idx)
-
 }
 
 
