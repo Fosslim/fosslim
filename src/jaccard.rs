@@ -90,21 +90,10 @@ impl JaccardModel {
         // tokenize doc
         let doc_tokens = tokenizer::tokenize_whitespace(target_doc.text.clone());
         // build term vector from doc
-        let term_vec = make_term_vector(&self.terms, &doc_tokens);
+        let query_vec = make_term_vector(&self.terms, &doc_tokens);
         // calc scores for each doc
-        /*
-        let mut scores = JaccardModel::score(self, term_vec);
-        scores.sort();
-        match scores.pop() {
-            None => None,
-            Some(score) => {
-                let mut best_score = Score::new(score.doc_id.clone(), score.score);
-                best_score.label = self.labels.get(score.doc_id).cloned();
-                Some(best_score)
-            }
-        }
-        */
-        None
+
+        JaccardModel::rank(self, query_vec).pop()
     }
 }
 

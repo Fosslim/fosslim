@@ -148,6 +148,10 @@ impl Index {
             _ => None
         }
     }
+
+    pub fn get_documents(&self) -> Vec<Document> {
+        self.documents.clone()
+    }
 }
 
 
