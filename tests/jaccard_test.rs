@@ -54,3 +54,52 @@ fn test_jaccard_from_example_index() {
     assert_eq!(1, mdl.word_bag[1][3]); // but not in document.2
 }
 
+
+#[test]
+fn test_jaccard_score_all_different() {
+    let res = jaccard::score( vec![0,0], vec![1, 1] );
+    assert_eq!(0.0, res);
+}
+
+#[test]
+fn test_jaccard_score_all_same() {
+    let res = jaccard::score( vec![1,1], vec![1, 1] );
+    assert_eq!(1.0, res);
+}
+
+
+#[test]
+fn test_jaccard_score_only_half_matching() {
+    let res = jaccard::score( vec![0,0], vec![1, 0] );
+    assert!(0.33 < res);
+    assert!(0.35 > res);
+
+    let res = jaccard::score( vec![1, 1, 1, 1], vec![1, 0, 0, 1]);
+    assert!(0.33 < res);
+    assert!(0.35 > res);
+}
+
+#[test]
+fn test_jaccard_rank_doc1_first(){
+    let idx = create_test_index();
+    let mdl = jaccard::from_index(&idx);
+
+    assert_eq!(2, mdl.labels.len());
+    assert_eq!(4, mdl.terms.len());
+    assert_eq!(2, mdl.word_bag.len());
+    assert_eq!(4, mdl.word_bag[0].len());
+
+    // brown = 1, dog = 0, fox = 1, lazy = 0
+    let scores = mdl.rank(vec![1, 1, 0, 0]);
+
+    println!("score: {} > {}", scores[0].score, scores[1].score);
+
+    assert_eq!(2, scores.len());
+    assert_eq!(1.0, scores[0].score);
+    assert_eq!(0, scores[0].doc_id);
+    assert_eq!(Some("doc1".to_string()), scores[0].label);
+
+    assert!(0.1 > scores[1].score);
+    assert_eq!(1, scores[1].doc_id);
+    assert_eq!(Some("doc2".to_string()), scores[1].label);
+}

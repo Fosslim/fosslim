@@ -3,15 +3,17 @@ use std::f32;
 
 #[derive]
 pub struct Score {
-    doc_id: usize,
-    score : f32
+    pub doc_id: usize,
+    pub score : f32,
+    pub label : Option<String>
 }
 
 impl Score {
     pub fn new(doc_id: usize, score: f32) -> Score {
         Score {
             doc_id: doc_id,
-            score: score
+            score: score,
+            label: None
         }
     }
 }

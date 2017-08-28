@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::convert::From;
 
 use index::Index;
 use document::Document;
@@ -34,6 +35,21 @@ fn test_jaccard_empty_bag(){
     assert_eq!(1, bag[0].len());
 }
 
+pub fn score(t1: TermVector, t2: TermVector) -> f32 {
+    if t1.len() != t1.len() { return 0.0; }
+    if t1.len() == 0 { return 0.0; }
+
+    // count how many terms are common;
+    let n_common = (0..t1.len())
+        .fold(0.0, |acc, i|{
+            if t1[i] == t2[i] { acc + 1.0} else { acc }
+        });
+
+    let total_size = (t1.len() + t2.len()) as u16;
+    let res = n_common  / ( f32::from(total_size) - n_common);
+
+    res
+}
 
 impl JaccardModel {
     pub fn new(n_terms: usize, n_docs:usize) -> JaccardModel {
@@ -44,22 +60,51 @@ impl JaccardModel {
         }
     }
 
-    //TODO: finish
-    pub fn score(&self, term_vec: TermVector) -> Vec<Score> {
+    // ranks documents in Word vector, compared to query vector
+    pub fn rank(&self, query_vec: TermVector) -> Vec<Score> {
+        let mut scores : Vec<Score> = Vec::with_capacity(self.labels.len());
+        let mut doc_id = 0 as usize;
 
-        vec![Score::new(0, 0.1)]
+        println!("query: {:?}", query_vec.clone());
+
+        for doc_term_vec in self.word_bag.iter() {
+            println!("term: {:?}", doc_term_vec.clone());
+
+            let sim = score(doc_term_vec.clone(), query_vec.clone());
+            let score = Score {
+                score: sim,
+                doc_id: doc_id,
+                label:  Some(self.labels[doc_id].clone())
+            };
+
+            scores.push(score);
+            doc_id += 1;
+        }
+
+        scores.sort_by(|a,b| b.cmp(a) );
+        scores
     }
 
     //TODO: finish
-    pub fn match_document(&self, target_doc: &Document){
+    pub fn match_document(&self, target_doc: &Document) -> Option<Score> {
         // tokenize doc
         let doc_tokens = tokenizer::tokenize_whitespace(target_doc.text.clone());
         // build term vector from doc
         let term_vec = make_term_vector(&self.terms, &doc_tokens);
         // calc scores for each doc
+        /*
         let mut scores = JaccardModel::score(self, term_vec);
-        scores.sort()
-        // sort and take the highest score
+        scores.sort();
+        match scores.pop() {
+            None => None,
+            Some(score) => {
+                let mut best_score = Score::new(score.doc_id.clone(), score.score);
+                best_score.label = self.labels.get(score.doc_id).cloned();
+                Some(best_score)
+            }
+        }
+        */
+        None
     }
 }
 
