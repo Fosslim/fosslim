@@ -4,13 +4,16 @@ use std::path::Path;
 //TODO: reseacrc: will it be bottleneck, or BufferedWriter
 use std::io::{Write, Read};
 use std::collections::BTreeMap;
+use std::cmp::Ordering;
 
 use serde::{Deserialize, Serialize};
 use rmp_serde::{Deserializer, Serializer};
 
+use tokenizer;
 use document::{self, Document};
 
 type TermIndex = Vec<Vec<usize>>;
+type TermIdPair = (usize, String);
 
 #[derive(Debug)]
 pub struct IndexerError<'a> {
@@ -26,7 +29,7 @@ impl<'a> IndexerError<'a> {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Index {
     pub n_terms: usize,
-    pub n_docs: usize,
+    pub n_docs: usize, // number of indexed documents
     terms: BTreeMap<String, usize>,
     documents: Vec<Document>,
     term_doc_idx: Vec<Vec<usize>>, // matrix [0 -> [docID1, docID2]]
@@ -68,25 +71,27 @@ impl Index {
         Ok(current_doc_id)
     }
 
-    pub fn index_doc(&mut self, doc_id: usize) -> Result<usize, IndexerError> {
-        if doc_id >= self.documents.len() {
-            return Err(IndexerError::new("found no such document"));
-        }
+    pub fn index(&mut self) -> Result<usize, IndexerError> {
+        let mut doc_id:usize = 0;
 
-        // TODO: mover tokenizer into own module
-        let mut doc = self.documents[doc_id].clone();
-        doc.tokenize();
+        for doc in self.documents.clone().iter() {
+            let tokens = tokenizer::tokenize_whitespace(doc.text.clone());
 
-        for term in doc.tcm.keys() {
-            match self.add_term(term.clone()) {
-                None => return Err(IndexerError::new("Failed to add term into index")),
-                Some(term_id) => {
-                    // add document into term_doc_idx
-                    self.add_doc_into_term_idx(term_id, doc_id);
+            for term in tokens.iter() {
+                // &mut *self - trick to pass compiler error when re-burrowing mutable val
+                match Index::add_term(&mut *self, term.clone()) {
+                    None => return Err(IndexerError::new("Failed to add term into index")),
+                    Some(term_id) => {
+                        // add document into term_doc_idx
+                        self.add_doc_into_term_idx(term_id, doc_id);
+                    }
                 }
             }
+
+            doc_id += 1; // here it increase doc_id
         }
 
+        self.n_docs = doc_id; // keep number of documents that are indexed
         Ok(doc_id)
     }
 
@@ -106,13 +111,17 @@ impl Index {
         Some(docs)
     }
 
+    //TODO: fix - order by values (term_id) before returning
     pub fn get_terms(&self) -> Vec<String> {
         let mut vocabulary = Vec::with_capacity(self.n_terms);
-        for term in self.terms.keys() {
-            vocabulary.push(term.to_string() )
+
+        for (term, &term_id) in self.terms.iter() {
+            vocabulary.push( (term_id, term.to_string()) )
         }
 
-        vocabulary
+        vocabulary.sort_by(|a, b| cmp_term_pair(a, b) ); // sort in ascending order
+        // return only term strings as it is sorted
+        vocabulary.iter().map(|x| x.1.clone() ).collect()
     }
 
     fn add_doc_into_term_idx(&mut self, term_id: usize, doc_id: usize) -> Option<usize> {
@@ -135,6 +144,7 @@ impl Index {
         let mut term_id = 0 as usize;
 
         for doc_ids in self.term_doc_idx.iter() {
+            // FIX: term_id is wrong as terms are not ordered?
             term_idx.push( (term_id, doc_ids.clone() ) );
             term_id += 1;
         }
@@ -175,10 +185,7 @@ pub fn build_from_path<'a>(target_path: &'a str) -> Result<Index, IndexerError> 
         }
     }
 
-    let n_docs = idx.n_docs as u32;
-    for id in 0..n_docs {
-        idx.index_doc(id as usize).is_ok();
-    }
+    idx.index().is_ok();
 
     Ok(idx)
 }
@@ -214,5 +221,14 @@ pub fn load<'a>(source_path: &'a str) -> Result<Index, IndexerError> {
     match Deserialize::deserialize(&mut de) {
         Ok(idx) => Ok(idx),
         Err(_)  => Err(IndexerError::new("Failed to deserialize file buffer"))
+    }
+}
+
+
+fn cmp_term_pair(a: &TermIdPair, b: &TermIdPair) -> Ordering {
+    if a.0 >= b.0 {
+        Ordering::Greater
+    } else {
+        Ordering::Less
     }
 }

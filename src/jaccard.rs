@@ -16,7 +16,7 @@ pub struct JaccardModel {
     pub word_bag: WordBag
 }
 
-fn init_empty_bag(n_terms: usize, n_docs: usize) -> WordBag {
+fn init_empty_bag(n_docs: usize, n_terms: usize) -> WordBag {
     let mut bag = Vec::with_capacity(n_docs);
 
     // initialize all subvectors
@@ -29,7 +29,7 @@ fn init_empty_bag(n_terms: usize, n_docs: usize) -> WordBag {
 
 #[test]
 fn test_jaccard_empty_bag(){
-    let bag = init_empty_bag(1, 2);
+    let bag = init_empty_bag(2, 1);
 
     assert_eq!(2, bag.len());
     assert_eq!(1, bag[0].len());
@@ -56,7 +56,7 @@ impl JaccardModel {
         JaccardModel {
             terms: Vec::with_capacity(n_terms),
             labels: Vec::with_capacity(n_docs),
-            word_bag: init_empty_bag(n_terms, n_docs)
+            word_bag: init_empty_bag(n_docs, n_terms)
         }
     }
 
@@ -65,11 +65,8 @@ impl JaccardModel {
         let mut scores : Vec<Score> = Vec::with_capacity(self.labels.len());
         let mut doc_id = 0 as usize;
 
-        println!("query: {:?}", query_vec.clone());
-
         for doc_term_vec in self.word_bag.iter() {
-            println!("term: {:?}", doc_term_vec.clone());
-
+            
             let sim = score(doc_term_vec.clone(), query_vec.clone());
             let score = Score {
                 score: sim,
@@ -81,11 +78,10 @@ impl JaccardModel {
             doc_id += 1;
         }
 
-        scores.sort_by(|a,b| b.cmp(a) );
+        scores.sort_by(|a,b| a.cmp(b) );
         scores
     }
 
-    //TODO: finish
     pub fn match_document(&self, target_doc: &Document) -> Option<Score> {
         // tokenize doc
         let doc_tokens = tokenizer::tokenize_whitespace(target_doc.text.clone());
@@ -101,7 +97,7 @@ impl JaccardModel {
 pub fn from_index(idx: &Index) -> JaccardModel {
     let term_vector = idx.get_terms();
     let mut labels = vec!["".to_string(); idx.n_docs];
-    let mut bag = init_empty_bag(idx.n_terms, idx.n_docs);
+    let mut bag = init_empty_bag(idx.n_docs, idx.n_terms);
 
     // init document labels
     for doc_id in 0..idx.n_docs {
@@ -130,10 +126,12 @@ pub fn from_index(idx: &Index) -> JaccardModel {
 
 
 // builds term vector (~ row of Wordbag) for
-fn make_term_vector(terms: &Vec<String>, doc_tokens: &Vec<String>) -> TermVector {
+pub fn make_term_vector(terms: &Vec<String>, doc_tokens: &Vec<String>) -> TermVector {
     let mut term_vec = Vec::with_capacity(terms.len());
 
+    // TODO: fix
     for term in terms.iter() {
+
         if doc_tokens.contains(term) {
             term_vec.push(1);
         } else {
