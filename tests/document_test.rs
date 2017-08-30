@@ -1,6 +1,7 @@
 extern crate fosslim;
 
 use std::fs::File;
+use std::path::Path;
 
 use fosslim::document::{self, Document};
 
@@ -37,4 +38,14 @@ fn test_document_from_json_file(){
         assert_eq!("MIT", doc.label);
         assert_eq!(1077, doc.text.len());
     }
+}
+
+#[test]
+fn test_document_read_test_folder(){
+    let test_path = Path::new("tests/fixtures/licenses");
+
+    let docs = document::read_folder(&test_path).expect("Failed to read test folder");
+    assert_eq!(2, docs.len());
+    assert_eq!("0BSD".to_string(), docs[0].label);
+    assert_eq!("MIT".to_string(), docs[1].label);
 }
