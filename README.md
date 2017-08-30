@@ -1,37 +1,44 @@
-# fosslim
+# FOSSlim
 
-FOSSlim stands for Free Open Source Software LIcense Matcher and it matches various forms of specifications of OSS licenses with SPDX ids or well-known unified license names;
+FOSSlim stands for **F**ree **O**pen *S*ource *S*oftware **LI**cense **M**atcher and
+it matches various forms of specifications of the OSS licenses with their ids, by default it would be SPDX-ids, 
+but user can easily change training data;
 
-It was built due te fact that other alternatives were either closed source or were just quick hack to scratch their own limited use-case. Sadly all of them miss real benchmarks with the measure the rate of false positivesm which can be very expensive error in the due diligence process;
 
-It is not first of its kind, but it will be the first which:
+Current design goals:
 
-* can find matches based on a license text, url text, a content of a README etc
-* decreases false positives
-* minimizes noise
-* supports dual licensed projects
-* supports all the SPDX licenses
-* recognizes EULAs
+* match based on a license text, url, a content of a README etc
+* decrease false positives
+* support dual licensed projects
+* list of licenses (default: all SPDX) is extendible
+* recognizes popular EULAs
 * detects additional clauses in license texts
-* extensively benchmarked and tested
+* benchmarked and tested
 
 
-It is still under **active development**, but it will be released as Rust library, commandline tool, simple API and RoR extension via Helix project;
+It is still under **active development**, but it will be released as 
+
+1. Rust library ( *milestone.1*, *milestone.3* )
+2. RoR gem with example API ( *milestone.2* )
+3. commandline tool to scan files, TBD
+4. NodeJS library with example API, TBD
+5. Rust Microservice, TBD
+
+
+#### Usage
+
+```rust
+
+//TODO: after first release
+```
+
 
 #### Current alternatives
 
+here are some of alternatives you could use already now:
+
 * SPDX lookup - https://github.com/bbqsrc/spdx-lookup-python
 * LibrariesIO license normalizer - https://github.com/librariesio/spdx
-* Google's license classifier - https://github.com/google/licenseclassifier
-* Fossology - https://github.com/fossology/fossology
+* **Google's license classifier** - https://github.com/google/licenseclassifier
+* **Fossology** - https://github.com/fossology/fossology
 * LicenseFinder - https://github.com/pivotal/LicenseFinder
-
-and many other similar hacks on Github
-
-
-
-
-
-
-
-
