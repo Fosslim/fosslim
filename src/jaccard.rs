@@ -66,7 +66,7 @@ impl JaccardModel {
         let mut doc_id = 0 as usize;
 
         for doc_term_vec in self.word_bag.iter() {
-            
+
             let sim = score(doc_term_vec.clone(), query_vec.clone());
             let score = Score {
                 score: sim,

@@ -8,16 +8,18 @@ use fosslim::document;
 use fosslim::score::Score;
 
 // for executing this tests with output
-// cargo test test_cross_check -- --nocapture
+// cargo test test_check_files -- --nocapture
 
 #[test]
-fn test_cross_check_document_match(){
-    let data_path = "data/licenses";
+fn test_check_files_with_fixtures(){
+    let data_path = "tests/fixtures/licenses";
+    let fixtures_path = "tests/fixtures/test_licenses";
 
     print!("Building index...");
     let idx = index::build_from_path(data_path).expect("Failed to build test index");
     println!("Done");
 
+    // build model
     print!("Building the test model...");
     let mdl = jaccard::from_index(&idx);
     println!("Done");
@@ -27,17 +29,19 @@ fn test_cross_check_document_match(){
     let mut fails  = 0;
 
     println!("Correct?|Expected|Result|Score");
-    for doc in idx.get_documents().iter() {
+    // iterate over all files in tests/test_licenses and check result between doc.label and match
+    let examples_path = Path::new(fixtures_path);
+    for doc in document::read_folder(examples_path).expect("Failed to read folder").iter() {
         n_docs += 1;
 
         if let Some(score) = mdl.match_document(doc) {
             let res_label = score.label.unwrap_or("".to_string());
 
             if doc.label == res_label {
-                println!("+| {} | {} | {}", doc.label, res_label, score.score);
+                println!("+|{}|{}|{}", doc.label, res_label, score.score);
                 true_pos += 1;
             } else {
-                println!("-| {} | {} | {}", doc.label, res_label, score.score);
+                println!("-|{}|{}|{}", doc.label, res_label, score.score);
                 false_neg += 1;
             }
 
@@ -48,7 +52,8 @@ fn test_cross_check_document_match(){
         }
     }
 
-    let accuracy = (true_pos as f32) / (n_docs as f32);
+    let accuracy:f32 = (true_pos as f32) / (n_docs as f32);
     println!("#-- Summary\n\t Matched #{}\n\tCorrect: {}", n_docs, true_pos);
     println!("\tFalse negatives: {}\n\tFails: {}\n\tAccuracy: {}", false_neg, fails, accuracy);
+
 }

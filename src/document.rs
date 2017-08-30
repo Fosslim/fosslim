@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::fs::File;
 use std::io::{ Error, ErrorKind };
 
@@ -26,6 +26,7 @@ impl Document {
         }
     }
 
+    // TODO: remove it
     // splits document text into tokens and saves result its on tcm field
     pub fn tokenize(&mut self) {
         let txt = self.text.clone();
@@ -40,6 +41,7 @@ impl Document {
 
 pub fn from_json_file(file_path: PathBuf) -> Result<Document, Error> {
     if let Ok(file) = File::open(file_path) {
+
         parse_from_file(file)
     } else {
         Err(Error::new(ErrorKind::NotFound, "No such file"))
@@ -57,4 +59,27 @@ pub fn parse_from_file(file: File) -> Result<Document, Error> {
     );
 
     Ok(temp_doc)
+}
+
+// reads and parses all documents from Path and turns them into Document
+// ps: it returns error when the folder includes anything else
+pub fn read_folder(path: &Path) -> Result<Vec<Document>, Error> {
+    let mut docs: Vec<Document> = Vec::new();
+
+    // iterate over files and build docs and add them into index
+    for entry in path.read_dir().expect("read_dir failed") {
+
+        if let Ok(metadata) = entry {
+            // add new document into index only if parsing was successful
+            match from_json_file(metadata.path()) {
+                Ok(doc) => docs.push(doc),
+                Err(e)  => {
+                    println!("Failed to parse: {:?}", metadata.path());
+                    return Err(e)
+                }
+            }
+        }
+    };
+
+    Ok(docs)
 }

@@ -111,7 +111,6 @@ impl Index {
         Some(docs)
     }
 
-    //TODO: fix - order by values (term_id) before returning
     pub fn get_terms(&self) -> Vec<String> {
         let mut vocabulary = Vec::with_capacity(self.n_terms);
 
@@ -174,6 +173,7 @@ pub fn build_from_path<'a>(target_path: &'a str) -> Result<Index, IndexerError> 
 
     let mut idx = Index::new();
 
+    //TODO: refactor it into document::read_all_from_folder(&path)
     // iterate over files and build docs and add them into index
     for entry in path.read_dir().expect("read_dir failed") {
         if let Ok(metadata) = entry {
@@ -185,7 +185,7 @@ pub fn build_from_path<'a>(target_path: &'a str) -> Result<Index, IndexerError> 
         }
     }
 
-    idx.index().is_ok();
+    idx.index().is_ok(); // re-index the content
 
     Ok(idx)
 }
