@@ -45,7 +45,7 @@ fn test_bench_make_term_vector(b: &mut Bencher) {
     let doc = document::parse_from_file(fp).expect("Failed to build document");
     let tokens = fosslim::tokenizer::tokenize_whitespace(doc.text);
 
-    // 3_190_452 ns  ==> BAD!!
+    // 3_190_452 ns  ==> BAD!!, 373_761ns => OK
     b.iter(|| jaccard::make_term_vector(&mdl.terms, &tokens));
 }
 

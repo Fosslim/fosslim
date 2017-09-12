@@ -4,16 +4,18 @@ use std::fs::File;
 use std::path::Path;
 
 use fosslim::document::{self, Document};
+use fosslim::tokenizer;
 
 #[test]
 fn test_document_tokenizer(){
     let mut doc = Document::new(0, "MIT".to_string(), "AAA BCD AAA DEF".to_string() );
-    doc.tokenize();
+    let tokens = tokenizer::tokenize_whitespace(doc.text.clone());
+    doc.add_tf(&tokens);
 
-    assert_eq!(2, doc.tcm["AAA"]);
-    assert_eq!(1, doc.tcm["BCD"]);
-    assert_eq!(1u32, doc.tcm["DEF"]);
-    assert_eq!(None, doc.tcm.get("XYZ"));
+    assert_eq!(2, doc.tf["AAA"]);
+    assert_eq!(1, doc.tf["BCD"]);
+    assert_eq!(1u32, doc.tf["DEF"]);
+    assert_eq!(None, doc.tf.get("XYZ"));
 }
 
 #[test]

@@ -26,6 +26,7 @@ fn test_cross_check_document_match(){
     let mut n_docs = 0;
     let mut fails  = 0;
 
+    println!("Index. N_Terms: {}, N_Docs: #{}", idx.n_terms, idx.n_docs);
     println!("Correct?|Expected|Result|Score");
     for doc in idx.get_documents().iter() {
         n_docs += 1;
