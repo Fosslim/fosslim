@@ -105,10 +105,10 @@ fn test_jaccard_rank_doc1_first(){
     assert_eq!(2, mdl.word_bag.len());
     assert_eq!(4, mdl.word_bag[0].len());
 
-    // brown = 1, dog = 0, fox = 1, lazy = 0
+    // brown = 1, fox = 1, lazy = 0, dog = 0
     let scores = mdl.rank(vec![1, 1, 0, 0]);
-
     println!("score: {} > {}", scores[0].score, scores[1].score);
+    println!("Terms: {:?}", mdl.terms);
 
     assert_eq!(2, scores.len());
     assert_eq!(1.0, scores[0].score);

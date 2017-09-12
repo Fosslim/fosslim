@@ -143,7 +143,6 @@ impl Index {
         let mut term_id = 0 as usize;
 
         for doc_ids in self.term_doc_idx.iter() {
-            // FIX: term_id is wrong as terms are not ordered?
             term_idx.push( (term_id, doc_ids.clone() ) );
             term_id += 1;
         }

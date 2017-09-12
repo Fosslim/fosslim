@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::f32;
 
-#[derive]
+#[derive(Clone)]
 pub struct Score {
     pub doc_id: usize,
     pub score : f32,

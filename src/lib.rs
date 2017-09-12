@@ -10,4 +10,3 @@ pub mod index;
 pub mod tokenizer;
 pub mod score;
 pub mod jaccard;
-

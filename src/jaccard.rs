@@ -1,5 +1,6 @@
-use std::collections::HashMap;
+use std::collections::HashSet;
 use std::convert::From;
+use std::iter::FromIterator;
 
 use index::Index;
 use document::Document;
@@ -36,7 +37,7 @@ fn test_jaccard_empty_bag(){
 }
 
 pub fn score(t1: TermVector, t2: TermVector) -> f32 {
-    if t1.len() != t1.len() { return 0.0; }
+    if t1.len() != t2.len() { return 0.0; }
     if t1.len() == 0 { return 0.0; }
 
     // count how many terms are common;
@@ -78,7 +79,7 @@ impl JaccardModel {
             doc_id += 1;
         }
 
-        scores.sort_by(|a,b| a.cmp(b) );
+        scores.sort_by(|a,b| b.cmp(a) );
         scores
     }
 
@@ -89,7 +90,13 @@ impl JaccardModel {
         let query_vec = make_term_vector(&self.terms, &doc_tokens);
         // calc scores for each doc
 
-        JaccardModel::rank(self, query_vec).pop()
+        let scores = JaccardModel::rank(self, query_vec);
+        if scores.len() > 0 {
+            Some(scores[0].clone())
+        } else {
+            None
+        }
+
     }
 }
 
@@ -129,10 +136,9 @@ pub fn from_index(idx: &Index) -> JaccardModel {
 pub fn make_term_vector(terms: &Vec<String>, doc_tokens: &Vec<String>) -> TermVector {
     let mut term_vec = Vec::with_capacity(terms.len());
 
-    // TODO: fix
+    let term_set:HashSet<&String> = HashSet::from_iter(doc_tokens.iter());
     for term in terms.iter() {
-
-        if doc_tokens.contains(term) {
+        if term_set.contains(term) {
             term_vec.push(1);
         } else {
             term_vec.push(0);

@@ -8,7 +8,7 @@ use fosslim::document;
 use fosslim::score::Score;
 
 // for executing this tests with output
-// cargo test test_check_files -- --nocapture
+// cargo test test_check_files  -- --nocapture
 
 #[test]
 fn test_check_files_with_fixtures(){
