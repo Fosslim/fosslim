@@ -3,7 +3,7 @@ extern crate fosslim;
 use std::path::Path;
 
 use fosslim::index;
-use fosslim::jaccard;
+use fosslim::naive_tf;
 use fosslim::document;
 use fosslim::score::Score;
 
@@ -21,7 +21,7 @@ fn test_check_files_with_fixtures(){
 
     // build model
     print!("Building the test model...");
-    let mdl = jaccard::from_index(&idx);
+    let mdl = naive_tf::from_index(&idx);
     println!("Done");
     let mut true_pos = 0;
     let mut false_neg = 0;
@@ -52,7 +52,7 @@ fn test_check_files_with_fixtures(){
         }
     }
 
-    let accuracy:f32 = (true_pos as f32) / (n_docs as f32);
+    let accuracy:f64 = f64::from(true_pos) / f64::from(n_docs);
     println!("#-- Summary\n\t Matched #{}\n\tCorrect: {}", n_docs, true_pos);
     println!("\tFalse negatives: {}\n\tFails: {}\n\tAccuracy: {}", false_neg, fails, accuracy);
 

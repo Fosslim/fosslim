@@ -3,7 +3,7 @@ extern crate fosslim;
 use std::path::Path;
 
 use fosslim::index;
-use fosslim::jaccard;
+use fosslim::naive_tf;
 use fosslim::document;
 use fosslim::score::Score;
 
@@ -19,7 +19,7 @@ fn test_cross_check_document_match(){
     println!("Done");
 
     print!("Building the test model...");
-    let mdl = jaccard::from_index(&idx);
+    let mdl = naive_tf::from_index(&idx);
     println!("Done");
     let mut true_pos = 0;
     let mut false_neg = 0;

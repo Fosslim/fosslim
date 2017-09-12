@@ -1,6 +1,8 @@
 use std::cmp::Ordering;
 use std::f32;
 
+type TermVector = Vec<u8>;
+
 #[derive(Clone)]
 pub struct Score {
     pub doc_id: usize,
@@ -57,3 +59,20 @@ fn test_score_comparison(){
     assert!(s2 == s3);
 }
 
+
+
+pub fn jaccard(t1: TermVector, t2: TermVector) -> f32 {
+    if t1.len() != t2.len() { return 0.0; }
+    if t1.len() == 0 { return 0.0; }
+
+    // count how many terms are common;
+    let n_common = (0..t1.len())
+        .fold(0.0, |acc, i|{
+            if t1[i] == t2[i] { acc + 1.0} else { acc }
+        });
+
+    let total_size = (t1.len() + t2.len()) as u16;
+    let res = n_common  / ( f32::from(total_size) - n_common);
+
+    res
+}

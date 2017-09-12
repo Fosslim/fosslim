@@ -9,7 +9,7 @@ use test::Bencher;
 
 use fosslim::document;
 use fosslim::index;
-use fosslim::jaccard;
+use fosslim::naive_tf;
 
 #[bench]
 fn test_bench_from_index(b: &mut Bencher){
@@ -21,7 +21,7 @@ fn test_bench_from_index(b: &mut Bencher){
     println!("Done");
 
     b.iter(||{
-        jaccard::from_index(&idx);
+        naive_tf::from_index(&idx);
     });
 }
 
@@ -38,7 +38,7 @@ fn test_bench_make_term_vector(b: &mut Bencher) {
 
     // build model
     print!("Building the test model...");
-    let mdl = jaccard::from_index(&idx);
+    let mdl = naive_tf::from_index(&idx);
     println!("Done");
 
     let fp = File::open("tests/fixtures/licenses/MIT.json").expect("Failed to open test file");
@@ -46,7 +46,7 @@ fn test_bench_make_term_vector(b: &mut Bencher) {
     let tokens = fosslim::tokenizer::tokenize_whitespace(doc.text);
 
     // 3_190_452 ns  ==> BAD!!, 373_761ns => OK
-    b.iter(|| jaccard::make_term_vector(&mdl.terms, &tokens));
+    b.iter(|| naive_tf::make_term_vector(&mdl.terms, &tokens));
 }
 
 

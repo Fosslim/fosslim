@@ -2,7 +2,7 @@ extern crate fosslim;
 
 use fosslim::index::Index;
 use fosslim::document::Document;
-use fosslim::jaccard;
+use fosslim::naive_tf;
 use fosslim::tokenizer;
 
 fn create_test_index() -> Index {
@@ -21,17 +21,17 @@ fn create_test_index() -> Index {
 }
 
 #[test]
-fn test_jaccard_init_new() {
-    let mdl = jaccard::JaccardModel::new(4, 2);
+fn test_naive_tf_init_new() {
+    let mdl = naive_tf::NaiveTFModel::new(4, 2);
 
     assert_eq!(4, mdl.terms.capacity());
     assert_eq!(2, mdl.labels.capacity());
 }
 
 #[test]
-fn test_jaccard_from_example_index() {
+fn test_naive_tf_from_example_index() {
     let idx = create_test_index();
-    let mdl = jaccard::from_index(&idx);
+    let mdl = naive_tf::from_index(&idx);
 
     assert_eq!(2, mdl.labels.len());
     assert_eq!(4, mdl.terms.len());
@@ -58,47 +58,21 @@ fn test_jaccard_from_example_index() {
 
 
 #[test]
-fn test_jaccard_make_term_vector_is_consistent() {
+fn test_naive_tf_make_term_vector_is_consistent() {
     let idx = create_test_index();
-    let mdl = jaccard::from_index(&idx);
+    let mdl = naive_tf::from_index(&idx);
     let docs = idx.get_documents();
-
-
     let doc_terms = tokenizer::tokenize_whitespace(docs[0].text.clone());
-
-    let query_vec = jaccard::make_term_vector(&mdl.terms, &doc_terms);
+    let query_vec = naive_tf::make_term_vector(&mdl.terms, &doc_terms);
 
     assert_eq!(mdl.word_bag[0], query_vec)
 }
 
-#[test]
-fn test_jaccard_score_all_different() {
-    let res = jaccard::score( vec![0,0], vec![1, 1] );
-    assert_eq!(0.0, res);
-}
 
 #[test]
-fn test_jaccard_score_all_same() {
-    let res = jaccard::score( vec![1,1], vec![1, 1] );
-    assert_eq!(1.0, res);
-}
-
-
-#[test]
-fn test_jaccard_score_only_half_matching() {
-    let res = jaccard::score( vec![0,0], vec![1, 0] );
-    assert!(0.33 < res);
-    assert!(0.35 > res);
-
-    let res = jaccard::score( vec![1, 1, 1, 1], vec![1, 0, 0, 1]);
-    assert!(0.33 < res);
-    assert!(0.35 > res);
-}
-
-#[test]
-fn test_jaccard_rank_doc1_first(){
+fn test_naive_tf_rank_doc1_first(){
     let idx = create_test_index();
-    let mdl = jaccard::from_index(&idx);
+    let mdl = naive_tf::from_index(&idx);
 
     assert_eq!(2, mdl.labels.len());
     assert_eq!(4, mdl.terms.len());

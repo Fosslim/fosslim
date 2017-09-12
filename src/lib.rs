@@ -9,4 +9,6 @@ pub mod document;
 pub mod index;
 pub mod tokenizer;
 pub mod score;
-pub mod jaccard;
+
+// models
+pub mod naive_tf;

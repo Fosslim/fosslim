@@ -4,14 +4,14 @@ use std::iter::FromIterator;
 
 use index::Index;
 use document::Document;
-use score::Score;
+use score::{self, Score};
 use tokenizer;
 
 type WordBag = Vec<Vec<u8>>;
 type TermVector = Vec<u8>;
 
 #[derive(Clone, Debug)]
-pub struct JaccardModel {
+pub struct NaiveTFModel {
     pub terms: Vec<String>, // keeps word vector
     pub labels: Vec<String>, // keeps document label index
     pub word_bag: WordBag
@@ -29,32 +29,16 @@ fn init_empty_bag(n_docs: usize, n_terms: usize) -> WordBag {
 }
 
 #[test]
-fn test_jaccard_empty_bag(){
+fn test_naive_tf_empty_bag(){
     let bag = init_empty_bag(2, 1);
 
     assert_eq!(2, bag.len());
     assert_eq!(1, bag[0].len());
 }
 
-pub fn score(t1: TermVector, t2: TermVector) -> f32 {
-    if t1.len() != t2.len() { return 0.0; }
-    if t1.len() == 0 { return 0.0; }
-
-    // count how many terms are common;
-    let n_common = (0..t1.len())
-        .fold(0.0, |acc, i|{
-            if t1[i] == t2[i] { acc + 1.0} else { acc }
-        });
-
-    let total_size = (t1.len() + t2.len()) as u16;
-    let res = n_common  / ( f32::from(total_size) - n_common);
-
-    res
-}
-
-impl JaccardModel {
-    pub fn new(n_terms: usize, n_docs:usize) -> JaccardModel {
-        JaccardModel {
+impl NaiveTFModel {
+    pub fn new(n_terms: usize, n_docs:usize) -> NaiveTFModel {
+        NaiveTFModel {
             terms: Vec::with_capacity(n_terms),
             labels: Vec::with_capacity(n_docs),
             word_bag: init_empty_bag(n_docs, n_terms)
@@ -68,7 +52,7 @@ impl JaccardModel {
 
         for doc_term_vec in self.word_bag.iter() {
 
-            let sim = score(doc_term_vec.clone(), query_vec.clone());
+            let sim = score::jaccard(doc_term_vec.clone(), query_vec.clone());
             let score = Score {
                 score: sim,
                 doc_id: doc_id,
@@ -90,7 +74,7 @@ impl JaccardModel {
         let query_vec = make_term_vector(&self.terms, &doc_tokens);
         // calc scores for each doc
 
-        let scores = JaccardModel::rank(self, query_vec);
+        let scores = NaiveTFModel::rank(self, query_vec);
         if scores.len() > 0 {
             Some(scores[0].clone())
         } else {
@@ -101,7 +85,7 @@ impl JaccardModel {
 }
 
 // build a new model from the Index
-pub fn from_index(idx: &Index) -> JaccardModel {
+pub fn from_index(idx: &Index) -> NaiveTFModel {
     let term_vector = idx.get_terms();
     let mut labels = vec!["".to_string(); idx.n_docs];
     let mut bag = init_empty_bag(idx.n_docs, idx.n_terms);
@@ -124,7 +108,7 @@ pub fn from_index(idx: &Index) -> JaccardModel {
 
     }
 
-    JaccardModel {
+    NaiveTFModel {
         terms: term_vector,
         labels: labels,
         word_bag: bag
@@ -150,7 +134,7 @@ pub fn make_term_vector(terms: &Vec<String>, doc_tokens: &Vec<String>) -> TermVe
 
 
 #[test]
-fn test_jaccard_make_term_vector(){
+fn test_naive_tf_make_term_vector(){
     let terms = vec!["brown".to_string(), "fox".to_string(), "jumps".to_string()];
     let tkns = vec!["red".to_string(), "fox".to_string().to_string()];
 
