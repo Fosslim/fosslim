@@ -1,10 +1,11 @@
 [package]
 name    = "fosslim"
-version = "0.0.1"
+version = "0.0.2-alpha"
 authors = ["Timo Sulg <timo@versioneye.com>"]
 description = "A License matcher for the FOSS licenses;"
 keywords  = ["FOSS", "license", "SPDX"]
 license   = "MIT"
+repository = "https://github.com/Fosslim/fosslim"
 
 [dependencies]
 serde           = "~ 1.0.11"
@@ -17,3 +18,4 @@ name    = "fosslim"
 path    = "src/lib.rs"
 test    = true
 plugin  = true
+crate-type = ["rlib", "dylib"]
