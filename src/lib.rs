@@ -1,3 +1,5 @@
+#![feature(pattern)]
+
 extern crate serde_json;
 
 #[macro_use]
