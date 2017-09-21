@@ -1,3 +1,6 @@
+use std::collections::HashSet;
+use std::iter::FromIterator;
+use std::hash::Hash;
 use std::cmp::Ordering;
 use std::f32;
 
@@ -75,4 +78,22 @@ pub fn jaccard(t1: TermVector, t2: TermVector) -> f32 {
     let res = n_common  / ( f32::from(total_size) - n_common);
 
     res
+}
+
+pub fn jaccard_set<T: Eq + Hash >(s1: &HashSet<T>, s2: &HashSet<T>) -> f32 {
+    match s1.union(s2).count() {
+        0 => 0.0,
+        t => ( s1.intersection(s2).count() as f32) / ( t as f32)
+    }
+}
+
+#[test]
+fn test_jaccard_set(){
+    let s1 = HashSet::from_iter(vec![1,2,3,4]);
+    let s2 = HashSet::from_iter(vec![3,4,5,6]);
+    let s3 = HashSet::from_iter(vec![5,6,7,8]);
+
+    assert_eq!(1.0, jaccard_set(&s1, &s1));
+    assert!(0.3 < jaccard_set(&s1, &s2));
+    assert_eq!(0.0, jaccard_set(&s1, &s3));
 }
