@@ -9,28 +9,26 @@ use test::Bencher;
 
 use fosslim::document;
 use fosslim::index;
-use fosslim::naive_tf;
+use fosslim::finger_ngram;
 
-// on console: cargo test test_bench -- --bench
+// on console: cargo test test_bench_finger_ngram -- --bench
+
 #[bench]
-fn test_bench_naive_tf_from_index(b: &mut Bencher){
+fn test_bench_finger_ngram_from_index(b: &mut Bencher){
     let data_path = "tests/fixtures/licenses";
     let fixtures_path = "tests/fixtures/test_licenses";
 
     print!("Building index...");
-    // bench:     383,496 ns/iter (+/- 38,006)
     let idx = index::build_from_path(data_path).expect("Failed to build test index");
     println!("Done");
 
-    b.iter(||{
-        naive_tf::from_index(&idx);
-    });
+    // bench:   2,050,853 ns/iter (+/- 230,371) , not the fastest
+    b.iter(||{ finger_ngram::from_index(&idx); });
 }
-
 
 // on console: cargo test test_bench -- --bench
 #[bench]
-fn test_bench_make_term_vector(b: &mut Bencher) {
+fn test_bench_finger_ngram_make_fingergram(b: &mut Bencher) {
     let data_path = "tests/fixtures/licenses";
     let fixtures_path = "tests/fixtures/test_licenses";
 
@@ -40,16 +38,12 @@ fn test_bench_make_term_vector(b: &mut Bencher) {
 
     // build model
     print!("Building the test model...");
-    let mdl = naive_tf::from_index(&idx);
+    let mdl = finger_ngram::from_index(&idx);
     println!("Done");
 
     let fp = File::open("tests/fixtures/licenses/MIT.json").expect("Failed to open test file");
     let doc = document::parse_from_file(fp).expect("Failed to build document");
-    let tokens = fosslim::tokenizer::tokenize_whitespace(doc.text);
 
-    // 3_190_452 ns  ==> BAD!!, 373_761ns => OK
-    b.iter(|| naive_tf::make_term_vector(&mdl.terms, &tokens));
+    // bench:   1,239,363 ns/iter (+/- 164,185)
+    b.iter(|| mdl.fingerprint( doc.text.clone() ));
 }
-
-
-

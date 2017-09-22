@@ -2,16 +2,17 @@ extern crate fosslim;
 
 use std::path::Path;
 
+use fosslim::finger_ngram;
+
 use fosslim::index;
-use fosslim::naive_tf;
 use fosslim::document;
 use fosslim::score::Score;
 
 // for executing this tests with output
-// cargo test test_cross_check -- --nocapture
+// cargo test test_finger_ngram_cross_check -- --nocapture
 
 #[test]
-fn test_cross_check_document_match(){
+fn test_finger_ngram_cross_check(){
     let data_path = "data/licenses";
 
     print!("Building index...");
@@ -19,8 +20,9 @@ fn test_cross_check_document_match(){
     println!("Done");
 
     print!("Building the test model...");
-    let mdl = naive_tf::from_index(&idx);
+    let mdl = finger_ngram::from_index(&idx);
     println!("Done");
+
     let mut true_pos = 0;
     let mut false_neg = 0;
     let mut n_docs = 0;
