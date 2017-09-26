@@ -1,6 +1,6 @@
 [package]
 name    = "fosslim"
-version = "0.0.3-alpha"
+version = "0.0.2"
 authors = ["Timo Sulg <timo@versioneye.com>"]
 description = "A License matcher for the FOSS licenses;"
 keywords  = ["FOSS", "license", "SPDX"]
