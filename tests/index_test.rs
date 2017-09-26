@@ -20,12 +20,12 @@ fn test_index_add_doc(){
     assert_eq!(0, idx.n_terms);
 
     let doc1 = Document::new(0, "doc1".to_string(), "text1".to_string());
-    idx.add(doc1);
+    idx.add(doc1).unwrap();
     assert_eq!(1, idx.n_docs);
     assert_eq!(0, idx.n_terms);
 
     let doc2 = Document::new(1, "doc2".to_string(), "text2".to_string());
-    idx.add(doc2);
+    idx.add(doc2).unwrap();
     assert_eq!(2, idx.n_docs);
 
 }
@@ -33,13 +33,13 @@ fn test_index_add_doc(){
 #[test]
 fn test_index_doc_new_document() {
     let mut idx = index::Index::new();
-    let mut doc = Document::new(0, "test".to_string(), "brown fox".to_string());
+    let doc = Document::new(0, "test".to_string(), "brown fox".to_string());
 
-    idx.add(doc);
+    idx.add(doc).unwrap();
     assert_eq!(1, idx.n_docs);
     assert_eq!(0, idx.n_terms);
 
-    idx.index();
+    idx.index().unwrap();
     assert_eq!(1, idx.n_docs);
     assert_eq!(2, idx.n_terms);
 
@@ -53,11 +53,11 @@ fn test_index_doc_new_document() {
 #[test]
 fn test_index_index_multiple_documents(){
     let mut idx = index::Index::new();
-    idx.add(Document::new(0, "doc1".to_string(), "brown fox".to_string()));
-    idx.add(Document::new(1, "doc2".to_string(), "lazy dog".to_string()));
-    idx.add(Document::new(2, "doc3".to_string(), "brown dog".to_string()));
+    idx.add(Document::new(0, "doc1".to_string(), "brown fox".to_string())).unwrap();
+    idx.add(Document::new(1, "doc2".to_string(), "lazy dog".to_string())).unwrap();
+    idx.add(Document::new(2, "doc3".to_string(), "brown dog".to_string())).unwrap();
 
-    idx.index();
+    idx.index().unwrap();
     assert_eq!(3, idx.n_docs);
     assert_eq!(4, idx.n_terms);
 
@@ -87,10 +87,10 @@ fn test_index_index_multiple_documents(){
 #[test]
 fn test_index_get_term_index(){
     let mut idx = index::Index::new();
-    let mut doc = Document::new(0, "test".to_string(), "yellow cat".to_string());
+    let doc = Document::new(0, "test".to_string(), "yellow cat".to_string());
 
-    idx.add(doc);
-    idx.index();
+    idx.add(doc).unwrap();
+    idx.index().unwrap();
     assert_eq!(1, idx.n_docs);
     assert_eq!(2, idx.n_terms);
 

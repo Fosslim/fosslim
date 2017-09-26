@@ -11,11 +11,10 @@ use fosslim::document;
 use fosslim::index;
 use fosslim::naive_tf;
 
-// on console: cargo test test_bench -- --bench
+// on console: cargo test test_bench_naive_tf -- --bench
 #[bench]
 fn test_bench_naive_tf_from_index(b: &mut Bencher){
     let data_path = "tests/fixtures/licenses";
-    let fixtures_path = "tests/fixtures/test_licenses";
 
     print!("Building index...");
     // bench:     383,496 ns/iter (+/- 38,006)
@@ -30,9 +29,8 @@ fn test_bench_naive_tf_from_index(b: &mut Bencher){
 
 // on console: cargo test test_bench -- --bench
 #[bench]
-fn test_bench_make_term_vector(b: &mut Bencher) {
+fn test_bench_naive_tf_make_term_vector(b: &mut Bencher) {
     let data_path = "tests/fixtures/licenses";
-    let fixtures_path = "tests/fixtures/test_licenses";
 
     print!("Building index...");
     let idx = index::build_from_path(data_path).expect("Failed to build test index");

@@ -5,7 +5,6 @@ use std::path::Path;
 use fosslim::index;
 use fosslim::naive_tf;
 use fosslim::document;
-use fosslim::score::Score;
 
 // for executing this tests with output
 // cargo test test_check_files  -- --nocapture

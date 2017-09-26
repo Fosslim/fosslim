@@ -8,12 +8,12 @@ use fosslim::tokenizer;
 fn create_test_index() -> Index {
     let mut idx = Index::new();
     let doc1 = Document::new(0, "doc1".to_string(), "brown fox".to_string());
-    idx.add(doc1);
+    idx.add(doc1).unwrap();
 
     let doc2 = Document::new(0, "doc2".to_string(), "lazy dog".to_string());
-    idx.add(doc2);
+    idx.add(doc2).unwrap();
 
-    idx.index();
+    idx.index().unwrap();
     assert_eq!(2, idx.n_docs);
     assert_eq!(4, idx.n_terms);
 

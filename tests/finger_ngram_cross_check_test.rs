@@ -1,14 +1,10 @@
 extern crate fosslim;
 
-use std::path::Path;
-
 use fosslim::finger_ngram;
-
 use fosslim::index;
-use fosslim::document;
-use fosslim::score::Score;
 
 // for executing this tests with output
+
 // cargo test test_finger_ngram_cross_check -- --nocapture
 
 #[test]

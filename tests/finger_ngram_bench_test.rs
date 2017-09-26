@@ -16,7 +16,6 @@ use fosslim::finger_ngram;
 #[bench]
 fn test_bench_finger_ngram_from_index(b: &mut Bencher){
     let data_path = "tests/fixtures/licenses";
-    let fixtures_path = "tests/fixtures/test_licenses";
 
     print!("Building index...");
     let idx = index::build_from_path(data_path).expect("Failed to build test index");
@@ -30,7 +29,6 @@ fn test_bench_finger_ngram_from_index(b: &mut Bencher){
 #[bench]
 fn test_bench_finger_ngram_make_fingergram(b: &mut Bencher) {
     let data_path = "tests/fixtures/licenses";
-    let fixtures_path = "tests/fixtures/test_licenses";
 
     print!("Building index...");
     let idx = index::build_from_path(data_path).expect("Failed to build test index");

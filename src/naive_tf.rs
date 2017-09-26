@@ -1,5 +1,5 @@
 use std::collections::HashSet;
-use std::convert::From;
+//use std::convert::From;
 use std::iter::FromIterator;
 
 use index::Index;
@@ -21,7 +21,7 @@ fn init_empty_bag(n_docs: usize, n_terms: usize) -> WordBag {
     let mut bag = Vec::with_capacity(n_docs);
 
     // initialize all subvectors
-    for doc_id in 0..n_docs {
+    for _doc_id in 0..n_docs {
         bag.push( vec![0; n_terms] );
     }
 

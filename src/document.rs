@@ -5,7 +5,6 @@ use std::io::{ Error, ErrorKind, BufReader };
 
 use serde_json;
 use serde_json::Value;
-use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Document {
@@ -45,7 +44,7 @@ pub fn from_json_file(file_path: PathBuf) -> Result<Document, Error> {
 }
 
 pub fn parse_from_file(file: File) -> Result<Document, Error> {
-    let mut rdr = BufReader::new(file);
+    let rdr = BufReader::new(file);
     let val:Value = serde_json::from_reader(rdr).expect("Failed to parse the file");
     let lic = val.as_object().expect("Failed to unpack JSON hashmap");
 

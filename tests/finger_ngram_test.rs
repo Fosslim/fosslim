@@ -1,7 +1,5 @@
 extern crate fosslim;
-extern crate seahash;
-
-use seahash::SeaHasher;
+//extern crate seahash;
 
 use fosslim::finger_ngram;
 use fosslim::index::Index;
@@ -17,7 +15,7 @@ fn create_test_index() -> Index {
     subject to the following conditions:\
     "#;
     let doc1 = Document::new(0, "mit".to_string(), mit_txt.to_string());
-    idx.add(doc1);
+    idx.add(doc1).unwrap();
 
     let bsd_txt = r#"
     Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -28,7 +26,7 @@ fn create_test_index() -> Index {
     and the following disclaimer in the documentation and/or other materials provided with the distribution.
     "#;
     let doc2 = Document::new(0, "bsd2".to_string(), bsd_txt.to_string());
-    idx.add(doc2);
+    idx.add(doc2).unwrap();
 
     idx.index().unwrap();
     assert_eq!(2, idx.n_docs);
@@ -43,8 +41,6 @@ fn test_finger_ngram_model_fingerprint(){
 
     let test_txt = "the quick brown fox jump over lazy dog".to_string();
     let fingerprint = mdl.fingerprint(test_txt);
-    let h1:u64  = 12370885609310141573;
-
 
     println!("Hash1: {}", finger_ngram::hash_text("quick brown fox".to_string()));
     println!("Fingerprints: {:?}", fingerprint);

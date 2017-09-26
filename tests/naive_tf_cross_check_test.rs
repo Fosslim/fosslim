@@ -1,14 +1,10 @@
 extern crate fosslim;
 
-use std::path::Path;
-
 use fosslim::index;
 use fosslim::naive_tf;
-use fosslim::document;
-use fosslim::score::Score;
 
 // for executing this tests with output
-// cargo test test_cross_check -- --nocapture
+// cargo test test_naive_tf_cross_check -- --nocapture
 
 #[test]
 fn test_naive_tf_cross_check(){
