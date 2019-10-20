@@ -1,3 +1,5 @@
+/* found alternative to bech on nightly
+ *
 #![feature(test)]
 #![cfg(test)]
 
@@ -45,3 +47,4 @@ fn test_bench_finger_ngram_make_fingergram(b: &mut Bencher) {
     // bench:   1,239,363 ns/iter (+/- 164,185)
     b.iter(|| mdl.fingerprint( doc.text.clone() ));
 }
+*/

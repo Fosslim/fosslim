@@ -4,11 +4,11 @@ use std::fs::File;
 use std::path::Path;
 
 use fosslim::document::{self, Document};
-use fosslim::tokenizer;
+use fosslim::tokenizer; //refactor: it'std unit tests here
 
 #[test]
-fn test_document_tokenizer(){
-    let mut doc = Document::new(0, "MIT".to_string(), "AAA BCD AAA DEF".to_string() );
+fn test_document_tokenizer() {
+    let mut doc = Document::new(0, "MIT".to_string(), "AAA BCD AAA DEF".to_string());
     let tokens = tokenizer::tokenize_whitespace(doc.text.clone());
     doc.add_tf(&tokens);
 
@@ -19,7 +19,7 @@ fn test_document_tokenizer(){
 }
 
 #[test]
-fn test_document_parse_from_file(){
+fn test_document_parse_from_file() {
     let fp = File::open("tests/fixtures/licenses/MIT.json").expect("Failed to open test file");
     let res = document::parse_from_file(fp);
 
@@ -31,7 +31,7 @@ fn test_document_parse_from_file(){
 }
 
 #[test]
-fn test_document_from_json_file(){
+fn test_document_from_json_file() {
     let fp = File::open("tests/fixtures/licenses/MIT.json").expect("Failed to open test file");
     let res = document::parse_from_file(fp);
 
@@ -43,7 +43,7 @@ fn test_document_from_json_file(){
 }
 
 #[test]
-fn test_document_read_test_folder(){
+fn test_document_read_test_folder() {
     let test_path = Path::new("tests/fixtures/licenses");
 
     let docs = document::read_folder(&test_path).expect("Failed to read test folder");

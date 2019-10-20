@@ -1,3 +1,4 @@
+/* find bencher which is not on nightly
 #![feature(test)]
 #![cfg(test)]
 
@@ -49,5 +50,4 @@ fn test_bench_naive_tf_make_term_vector(b: &mut Bencher) {
     b.iter(|| naive_tf::make_term_vector(&mdl.terms, &tokens));
 }
 
-
-
+*/
