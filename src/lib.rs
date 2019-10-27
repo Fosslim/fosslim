@@ -1,18 +1,14 @@
-#![feature(pattern)]
-
 extern crate serde_json;
 
-#[macro_use]
-extern crate serde_derive;
-extern crate serde;
-extern crate rmp_serde;
+//extern crate rmp_serde;
 extern crate seahash;
+//extern crate serde;
 
 pub mod document;
 pub mod index;
-pub mod tokenizer;
 pub mod score;
+pub mod tokenizer;
 
 // models
-pub mod naive_tf;
 pub mod finger_ngram;
+pub mod naive_tf;

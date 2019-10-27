@@ -1,17 +1,15 @@
 [package]
 name    = "fosslim"
 version = "0.0.2"
-authors = ["Timo Sulg <timo@versioneye.com>"]
+authors = ["Timo Sulg <timo@sulg.dev>"]
 description = "A License matcher for the FOSS licenses;"
 keywords  = ["FOSS", "license", "SPDX"]
 license   = "MIT"
 repository = "https://github.com/Fosslim/fosslim"
 
 [dependencies]
-serde           = "~ 1.0.11"
-serde_derive    = "~ 1.0.11"
 serde_json      = "~ 1.0.0"
-rmp-serde       = "~ 0.13.6"
+#rmp-serde       = "~ 0.13.6"
 seahash         = "~ 3.0.5"
 
 [lib]

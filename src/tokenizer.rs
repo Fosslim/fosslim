@@ -1,15 +1,13 @@
-use std::str::pattern::Pattern;
-
-const SEPARATORS: &'static str = ",.;:!?";
-
 pub fn tokenize_whitespace(text: String) -> Vec<String> {
-    let tokens: Vec<String> = text.split_whitespace().map(|t| t.to_string() ).collect();
+    let tokens: Vec<String> = text.split_whitespace().map(|t| t.to_string()).collect();
 
     tokens
 }
 
 /// It splits original text into word ngrams, which are overlapping by  (n-1) elements
 pub fn tokenize_overlapping_ngrams(text: String, n: usize) -> Vec<String> {
+    let separators = vec![',', '.', ';', ':', '!', '?'];
+
     let mut ngrams: Vec<String> = Vec::new();
 
     let mut curr_token = String::new();
@@ -19,14 +17,11 @@ pub fn tokenize_overlapping_ngrams(text: String, n: usize) -> Vec<String> {
         if ch.is_alphanumeric() {
             // add it to current token
             curr_token.push(ch);
-
-        } else if ch.is_whitespace() || ch.is_contained_in(SEPARATORS) {
-            if !curr_token.is_empty(){
-
+        } else if ch.is_whitespace() || separators.contains(&ch) {
+            if !curr_token.is_empty() {
                 curr_ngram.push(curr_token);
                 curr_token = String::new();
             }
-
         };
 
         // make some space when curr_ngram is full
@@ -44,7 +39,7 @@ pub fn tokenize_overlapping_ngrams(text: String, n: usize) -> Vec<String> {
         curr_ngram.push(curr_token);
     }
 
-    if !curr_ngram.is_empty(){
+    if !curr_ngram.is_empty() {
         ngrams.push(curr_ngram.join(" "))
     }
 
